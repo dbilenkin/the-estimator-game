@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#20222b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta property="og:title" content="The Estimator: The Game">
+<meta property="og:description" content="Mark Markson has lost his gift. Guess distances, counts and seconds to win it back, and take on Lester Lesterson.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23f47a2a'/%3E%3Ctext x='32' y='47' font-family='Arial' font-weight='900' font-size='44' text-anchor='middle' fill='%23fff6df'%3EE%3C/text%3E%3C/svg%3E">
+<title>The Estimator</title>
+<link rel="stylesheet" href="./style.css">
+<script type="importmap">
+{ "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/addons/" } }
+</script>
+</head>
+<body>
+<div id="title" class="hidden"><div class="card panel">
+  <h1>THE ESTIMATOR</h1>
+  <div class="sub">The Game &nbsp;·&nbsp; Level 6: The Appointment · Freestyle</div>
+  <button id="play" class="primary">Play</button>
+</div></div>
+
+<div id="card" class="hidden"></div>
+<div id="caption" class="panel hidden"><div class="who"></div><div class="text"></div></div>
+<button id="skip" class="hidden">Skip ▸</button>
+
+<div id="hud" class="hidden"></div>
+<div id="ask" class="panel hidden">
+  <div class="who">Bill</div>
+  <div class="q"></div>
+  <div id="dial">
+    <button class="round" id="minus">−</button>
+    <div class="num"><b id="val">0</b><span id="unit"></span></div>
+    <button class="round" id="plus">+</button>
+    <input type="range" id="slider">
+    <button class="primary" id="lock">That's my estimate</button>
+  </div>
+  <div class="hint"></div>
+</div>
+<div id="verdict" class="panel hidden">
+  <div class="who">Bill</div>
+  <div><div class="line"></div><div class="nums"></div></div>
+  <div style="text-align:center"><div class="stars"></div><button class="primary" id="next">Next</button></div>
+</div>
+<button id="act" class="primary hidden">NOW!</button>
+<div id="tags"></div>
+
+<div id="results" class="hidden"><div class="card panel">
+  <h2>Bill's assessment</h2>
+  <div class="rank"></div>
+  <div class="quote"></div>
+  <table></table>
+  <div class="btns"><button id="back">◂ Back</button><button id="again">Try again</button><button class="primary hidden" id="nextlevel"></button></div>
+</div></div>
+
+<script type="module" src="./level6.js"></script>
+</body>
+</html>

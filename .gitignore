@@ -1,0 +1,31 @@
+# Source material and working files that are large, personal, or not needed to run the game
+reference/
+previews/
+assets-src/
+tools/.venv/
+tools/models/
+tools/work/
+tools/__pycache__/
+**/__pycache__/
+*.blend1
+.DS_Store
+.claude/
+# the original 2010 game's music track, no longer used
+game/assets/music.mp3
+# unused character models from an earlier attempt
+game/assets/characters/Casual_2.gltf
+game/assets/characters/Casual_Hoodie.gltf
+game/assets/characters/Suit.gltf
+# abandoned face-likeness experiments (measurements and photos of real people)
+blender/fits/
+blender/human.py
+blender/fit_worker.py
+blender/compare.sh
+tools/facetex.py
+tools/film_shape.py
+tools/fit.py
+tools/landmarks.py
+tools/scan.py
+tools/shape.py
+tools/sheet.py
+blender/characters.py

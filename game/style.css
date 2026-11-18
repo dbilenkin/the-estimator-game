@@ -1,0 +1,183 @@
+  :root { --ink: #3b2417; --cream: #fff6df; --orange: #f47a2a; --teal: #2f8f8a; --yellow: #ffd23f; --red: #e5484d; }
+  html, body { margin: 0; height: 100%; background: #20222b; overflow: hidden; font-family: "Avenir Next", "Trebuchet MS", "Segoe UI", sans-serif; color: var(--ink); }
+  canvas { display: block; width: 100vw; height: 100vh; }
+  .hidden { display: none !important; }
+  .panel { background: var(--cream); border: 4px solid var(--ink); border-radius: 18px; box-shadow: 0 6px 0 var(--ink); }
+  button { font: inherit; font-weight: 800; cursor: pointer; color: var(--ink); background: var(--yellow); border: 4px solid var(--ink); border-radius: 14px; box-shadow: 0 4px 0 var(--ink); padding: 10px 22px; font-size: 19px; min-height: 48px; }
+  button:hover { filter: brightness(1.06); }
+  button:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+  button.primary { background: var(--orange); color: #fff; text-shadow: 0 2px 0 rgba(0,0,0,.25); }
+  button.round { width: 54px; height: 54px; padding: 0; border-radius: 50%; font-size: 28px; line-height: 1; }
+
+  #title { position: fixed; inset: 0; display: grid; place-items: center; background: linear-gradient(rgba(32,34,43,.25), rgba(32,34,43,.7)); }
+  #title .card { text-align: center; padding: 28px 44px 34px; max-width: min(620px, 88vw); }
+  #title h1 { margin: 0; font-size: clamp(40px, 7vw, 76px); line-height: .95; letter-spacing: -1px; color: var(--orange); -webkit-text-stroke: 3px var(--ink); paint-order: stroke fill; text-shadow: 0 6px 0 var(--ink); }
+  #title .sub { margin: 14px 0 22px; font-size: 20px; font-weight: 700; }
+  #title button { font-size: 26px; padding: 14px 44px; }
+
+  #caption { position: fixed; left: 50%; bottom: 5vh; transform: translateX(-50%); width: min(820px, 90vw); padding: 14px 22px 16px; font-size: clamp(18px, 2.3vw, 26px); font-weight: 700; line-height: 1.25; }
+  #caption .who { display: inline-block; margin: -30px 0 6px -8px; padding: 2px 14px; font-size: .72em; letter-spacing: .5px; text-transform: uppercase; color: #fff; background: var(--teal); border: 3px solid var(--ink); border-radius: 10px; }
+  #caption .who.mark { background: var(--red); }
+  #caption .who.jack { background: #8a7a5a; }
+  #card { position: fixed; inset: 0; display: grid; place-items: center; background: #14151b; color: var(--cream); font-size: clamp(28px, 5vw, 56px); font-weight: 800; font-style: italic; }
+  #skip { position: fixed; right: 18px; top: 16px; font-size: 19px; padding: 8px 20px; }
+  #mute { position: fixed; left: 18px; top: 16px; font-size: 18px; padding: 8px 16px; }
+
+  #hud { position: fixed; left: 50%; top: 14px; transform: translateX(-50%); display: flex; gap: 8px; align-items: center; padding: 6px 16px; background: var(--cream); border: 3px solid var(--ink); border-radius: 999px; }
+  #hud b { margin-right: 8px; font-size: 17px; }
+  #hud .pip { width: 18px; height: 18px; border-radius: 50%; border: 3px solid var(--ink); background: var(--cream); }
+  #hud .pip.done { background: var(--teal); }
+  #hud .pip.now { background: var(--yellow); transform: scale(1.25); }
+
+  #ask { position: fixed; left: 50%; bottom: 3.5vh; transform: translateX(-50%); width: min(860px, 92vw); padding: 14px 22px 18px; }
+  #ask .q { font-size: clamp(18px, 2.2vw, 25px); font-weight: 700; line-height: 1.25; min-height: 2.5em; }
+  #ask .who { display: inline-block; margin: -30px 0 6px -8px; padding: 2px 14px; font-size: 16px; letter-spacing: .5px; text-transform: uppercase; color: #fff; background: var(--teal); border: 3px solid var(--ink); border-radius: 10px; font-weight: 800; }
+  #dial { display: flex; align-items: center; gap: 14px; margin-top: 10px; }
+  #dial .num { min-width: 190px; text-align: center; padding: 2px 10px; background: #fff; border: 4px solid var(--ink); border-radius: 14px; }
+  #dial .num b { font-size: 46px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  #dial .num span { display: block; margin-top: -4px; font-size: 18px; font-weight: 700; opacity: .8; }
+  #dial input[type=range] { flex: 1; height: 44px; accent-color: var(--orange); transform: scaleY(1.8); }
+  #ask .hint { margin-top: 8px; font-size: 16px; font-weight: 600; opacity: .75; }
+
+  #verdict { position: fixed; left: 50%; bottom: 3.5vh; transform: translateX(-50%); width: min(860px, 92vw); padding: 14px 22px 18px; display: grid; grid-template-columns: 1fr auto; gap: 6px 20px; align-items: center; }
+  #verdict .who { grid-column: 1 / -1; justify-self: start; margin: -30px 0 0 -8px; padding: 2px 14px; font-size: 16px; letter-spacing: .5px; text-transform: uppercase; color: #fff; background: var(--teal); border: 3px solid var(--ink); border-radius: 10px; font-weight: 800; }
+  #verdict .line { font-size: clamp(18px, 2.2vw, 25px); font-weight: 700; line-height: 1.25; }
+  #verdict .nums { font-size: 19px; font-weight: 700; opacity: .85; margin-top: 4px; }
+  #verdict .stars { font-size: 40px; letter-spacing: 4px; color: var(--yellow); -webkit-text-stroke: 2.5px var(--ink); paint-order: stroke fill; }
+  #verdict .stars i { font-style: normal; color: #e6dcc3; }
+
+  .tag { position: fixed; transform: translate(-50%, -100%); padding: 0 10px; font-size: 26px; font-weight: 900; color: #fff; background: var(--orange); border: 3px solid var(--ink); border-radius: 12px; box-shadow: 0 3px 0 var(--ink); pointer-events: none; white-space: nowrap; }
+  .tag.big { font-size: 40px; background: var(--teal); }
+
+  #results { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(32,34,43,.55); }
+  #results .card { padding: 24px 36px 28px; width: min(560px, 90vw); text-align: center; }
+  #results h2 { margin: 0 0 2px; font-size: 20px; text-transform: uppercase; letter-spacing: 1px; opacity: .7; }
+  #results .rank { font-size: clamp(30px, 5vw, 46px); font-weight: 900; color: var(--orange); -webkit-text-stroke: 2px var(--ink); paint-order: stroke fill; line-height: 1.05; }
+  #results .quote { margin: 8px 0 14px; font-size: 19px; font-weight: 700; font-style: italic; }
+  #results table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 16px; font-weight: 700; text-align: left; }
+  #results td { padding: 3px 6px; border-bottom: 2px dashed rgba(59,36,23,.25); }
+  #results td:last-child i { font-style: normal; color: #e6dcc3; }
+  #results td:last-child { text-align: right; color: var(--yellow); -webkit-text-stroke: 1.5px var(--ink); paint-order: stroke fill; font-size: 20px; letter-spacing: 2px; white-space: nowrap; }
+  #results td:nth-child(2) { text-align: right; opacity: .75; white-space: nowrap; }
+
+  #act { position: fixed; left: 50%; bottom: 6vh; transform: translateX(-50%); font-size: clamp(30px, 5vw, 54px); padding: 18px 64px; border-radius: 22px; }
+  #act:active { transform: translateX(-50%) translateY(3px); }
+  #ask.nodial #dial .num, #ask.nodial #dial input, #ask.nodial #dial .round { display: none; }
+  #ask.nodial #dial { justify-content: flex-end; }
+  #results .card button { margin: 0 6px; }
+  #caption .who.elliot { background: #4a4d5c; }
+  .who.lester { background: #26262b !important; }
+  .who.official { background: #3a4a7a !important; }
+  .who.smith { background: #6b7078 !important; }
+  .who.jess { background: #c9962a !important; }
+  .who.guy { background: #5a5f6b !important; }
+  .who.mark { background: var(--red) !important; }
+  #hud b.tally { padding: 0 10px; border-left: 3px solid var(--ink); border-right: 3px solid var(--ink); }
+  #lock.hurry { background: var(--red); }
+  #card small { display: block; font-size: .45em; font-style: normal; font-weight: 700; opacity: .8; margin-top: 14px; }
+  #card { text-align: center; padding: 0 8vw; box-sizing: border-box; }
+  .who.amy { background: #c8552a !important; }
+  .who.jack { background: #8a7a5a !important; }
+  .who.guyson { background: #6b7078 !important; }
+  canvas { cursor: grab; touch-action: none; }
+
+  /* ---------- touch screens ---------- */
+  html { overscroll-behavior: none; }
+  body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  canvas { height: 100dvh; }
+  #results .btns { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  #results .card button { margin: 0; }
+  #continue { display: block; margin: 14px auto 0; font-size: 18px !important; padding: 8px 20px !important; }
+
+  /* ---------- menu ---------- */
+  #menubtn { position: fixed; left: calc(14px + env(safe-area-inset-left)); top: 12px; z-index: 6; width: 48px; height: 48px; min-height: 0; padding: 0; font-size: 24px; line-height: 1; }
+  #menu { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; background: rgba(20,21,27,.72); }
+  #menu .card { width: min(760px, 94vw); max-height: 94dvh; overflow: auto; box-sizing: border-box; padding: 18px 26px 22px; }
+  #menu h2 { margin: 0; font-size: 34px; color: var(--orange); -webkit-text-stroke: 2px var(--ink); paint-order: stroke fill; }
+  #menu .where { font-weight: 700; opacity: .75; margin-bottom: 10px; }
+  #menu h3 { margin: 14px 0 6px; font-size: 15px; text-transform: uppercase; letter-spacing: 1px; opacity: .7; }
+  #menu .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; }
+  #menu .cols > div:first-child > button { display: block; width: 100%; margin-bottom: 10px; }
+  #menu .cols > div:last-child h3 { margin-top: 0; }
+  #menu .confirm { margin: 0 0 10px; padding: 10px; font-weight: 700; background: #fff; border: 3px solid var(--red); border-radius: 12px; }
+  #menu .confirm button { margin: 8px 6px 0 0; font-size: 15px; padding: 6px 12px; min-height: 40px; }
+  #menu .levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  #menu .levels button { padding: 4px 2px; font-size: 20px; min-height: 0; background: #fff; }
+  #menu .levels button small { display: block; font-size: 10.5px; font-weight: 700; line-height: 1.15; }
+  #menu .levels button.on { background: var(--yellow); }
+  #menu button:disabled { opacity: .45; cursor: default; filter: none; }
+  #menu label { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; font-weight: 800; }
+  #menu label input { flex: 1; min-width: 0; accent-color: var(--orange); height: 30px; }
+  #menu label > span:not(.seg) { min-width: 44px; text-align: right; font-variant-numeric: tabular-nums; }
+  #menu .seg { display: flex; flex: 1; justify-content: flex-end; }
+  #menu .seg button { font-size: 14px; padding: 5px 10px; min-height: 38px; background: #fff; border-radius: 0; box-shadow: none; border-width: 3px; margin-left: -3px; }
+  #menu .seg button:first-child { border-radius: 10px 0 0 10px; }
+  #menu .seg button:last-child { border-radius: 0 10px 10px 0; }
+  #menu .seg button.on { background: var(--teal); color: #fff; }
+  #menu .note, #menu .how { font-size: 14px; font-weight: 600; opacity: .8; margin-top: 4px; }
+  #menu .how { margin-top: 10px; }
+
+  /* ---------- a phone held upright: ask for it to be turned ---------- */
+  #rotate { display: none; box-sizing: border-box; position: fixed; inset: 0; z-index: 40; place-items: center; text-align: center; background: #20222b; color: var(--cream); font-size: 24px; font-weight: 800; padding: 0 10vw; }
+  #rotate b { display: block; font-size: 72px; line-height: 1; color: var(--orange); }
+  #rotate small { display: block; margin-top: 8px; font-size: 15px; font-weight: 600; opacity: .75; }
+  @media (orientation: portrait) and (max-width: 599px) { #rotate { display: grid; } }
+
+  /* ---------- a phone held sideways (or any short window): the question panel docks on the right, the picture gets the rest ---------- */
+  @media (max-height: 520px) {
+    button { font-size: 15px; padding: 6px 14px; min-height: 40px; border-width: 3px; border-radius: 12px; box-shadow: 0 3px 0 var(--ink); }
+    button.round { width: 40px; height: 40px; font-size: 22px; }
+    .panel { border-width: 3px; border-radius: 14px; box-shadow: 0 4px 0 var(--ink); }
+    #menubtn { top: 6px; left: calc(8px + env(safe-area-inset-left)); width: 40px; height: 40px; font-size: 20px; }
+    #skip { top: 6px; right: calc(8px + env(safe-area-inset-right)); font-size: 15px; padding: 6px 14px; }
+    #hud { left: calc(58px + env(safe-area-inset-left)); transform: none; top: 8px; padding: 3px 10px; gap: 5px; border-width: 2px; }
+    #hud b { font-size: 12px; margin-right: 3px; }
+    #hud b.tally { padding: 0 6px; border-width: 2px; }
+    #hud .pip { width: 9px; height: 9px; border-width: 2px; }
+    #ask, #verdict { left: auto; right: calc(8px + env(safe-area-inset-right)); top: 8px; bottom: 10px; transform: none; box-sizing: border-box; width: min(310px, 38vw); padding: 10px 12px; display: flex; flex-direction: column; overflow-y: auto; }
+    #ask .who, #verdict .who { margin: 0 0 6px; align-self: flex-start; font-size: 12px; padding: 1px 10px; border-width: 2px; }
+    #ask .q { font-size: 15px; line-height: 1.2; min-height: 0; }
+    #ask .hint { order: 2; font-size: 11.5px; line-height: 1.25; margin-top: 6px; }
+    #dial { order: 3; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: auto; padding-top: 8px; }
+    #dial .num { order: 2; min-width: 96px; flex: 1; border-width: 3px; }
+    #dial .num b { font-size: 30px; }
+    #dial .num span { font-size: 12px; margin-top: -3px; }
+    #minus { order: 1; } #plus { order: 3; }
+    #dial input[type=range] { order: 4; flex: 1 1 100%; height: 32px; transform: scaleY(1.4); }
+    #lock { order: 5; flex: 1 1 100%; }
+    #verdict .line { font-size: 16px; }
+    #verdict .nums { font-size: 13.5px; }
+    #verdict > div:last-child { margin-top: auto; }
+    #verdict .stars { font-size: 30px; -webkit-text-stroke: 2px var(--ink); }
+    #verdict #next { width: 100%; }
+    #act { left: auto; right: calc(12px + env(safe-area-inset-right)); bottom: 12px; transform: none; font-size: 24px; padding: 12px 26px; border-radius: 16px; min-width: 150px; }
+    #act:active { transform: translateY(3px); }
+    #caption { bottom: 8px; width: min(640px, 82vw); padding: 8px 14px 9px; font-size: 15px; line-height: 1.2; }
+    #caption .who { margin: -22px 0 4px -4px; border-width: 2px; padding: 1px 10px; }
+    .tag { font-size: 14px; padding: 0 6px; border-width: 2px; border-radius: 8px; box-shadow: 0 2px 0 var(--ink); }
+    .tag.big { font-size: 20px; }
+    #title .card { padding: 12px 30px 16px; }
+    #title h1 { -webkit-text-stroke: 2px var(--ink); text-shadow: 0 4px 0 var(--ink); }
+    #title .sub { margin: 8px 0 12px; font-size: 15px; }
+    #title button { font-size: 20px; padding: 8px 34px; }
+    #continue { margin-top: 10px; font-size: 14px !important; padding: 6px 14px !important; }
+    #card small { font-size: .5em; }
+    #results .card { box-sizing: border-box; width: min(780px, 95vw); max-height: 94dvh; overflow-y: auto; padding: 10px 18px 12px; display: grid; grid-template-columns: 1fr 1.15fr; column-gap: 20px; align-content: center; }
+    #results h2 { font-size: 13px; grid-column: 1; }
+    #results .rank { font-size: 26px; grid-column: 1; }
+    #results .quote { font-size: 13.5px; margin: 6px 0 10px; grid-column: 1; }
+    #results .btns { grid-column: 1; gap: 8px; align-items: center; align-self: center; }
+    #results .btns button { font-size: 14px; padding: 5px 10px; }
+    #results table { grid-column: 2; grid-row: 1 / span 4; align-self: center; margin: 0; font-size: 13px; }
+    #results td:last-child { font-size: 15px; -webkit-text-stroke: 1px var(--ink); }
+    #menu .card { padding: 8px 16px 10px; }
+    #menu h2 { font-size: 22px; display: inline-block; margin-right: 10px; }
+    #menu .where { display: inline-block; font-size: 13px; margin: 0; }
+    #menu h3 { margin: 6px 0 4px; font-size: 12px; }
+    #menu .cols > div:first-child > button { margin-bottom: 6px; min-height: 36px; padding: 4px 10px; }
+    #menu .levels button { font-size: 15px; }
+    #menu .levels button small { font-size: 9.5px; }
+    #menu label { margin-bottom: 7px; font-size: 14px; }
+    #menu .seg button { font-size: 12.5px; padding: 3px 8px; min-height: 34px; }
+    #menu .note, #menu .how { font-size: 11.5px; margin-top: 2px; }
+  }
