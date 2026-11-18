@@ -436,7 +436,7 @@ function enterResults() {
 // ---------- input ----------
 function music() { if (audio) return; audio = shell.audio = startMusic(S.mode === 'cut' ? 'drama' : 'home', SET.music); }
 $('play').onclick = () => { if (SET.skipCuts) enterPlay(0); else enterCut(0); music(); };
-addEventListener('pointerdown', music, { once: true });
+for (const ev of ['pointerdown', 'touchend', 'click']) addEventListener(ev, music, { once: true });
 $('skip').onclick = () => enterPlay(0);
 $('slider').oninput = (e) => setGuess(+e.target.value);
 $('minus').onclick = () => setGuess(S.guess - (QUESTIONS[S.qi].step || 1));

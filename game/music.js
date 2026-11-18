@@ -18,6 +18,10 @@ export function startMusic(moodName = 'home', volume = 1) {
   const AC = window.AudioContext || window.webkitAudioContext;
   if (!AC) return { setMood() {}, setVolume() {}, toggle() { return false; }, stop() {} };
   const ac = new AC(), master = ac.createGain(), lp = ac.createBiquadFilter();
+  // phones start audio asleep and only wake it inside a tap or a click, so keep trying on each one until it is running
+  const wake = () => { if (ac.state !== 'running') ac.resume().catch(() => {}); };
+  for (const ev of ['touchend', 'click', 'pointerup', 'keydown']) addEventListener(ev, wake, true);
+  wake();
   master.gain.value = 0.0;
   master.gain.linearRampToValueAtTime(0.3 * volume, ac.currentTime + 1.5);
   lp.type = 'lowpass'; lp.frequency.value = 2600;

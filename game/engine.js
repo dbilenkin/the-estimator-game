@@ -237,7 +237,7 @@ export async function runLevel(cfg) {
   // ---------- input ----------
   function music() { if (audio) return; audio = shell.audio = startMusic(cfg.mood || 'home', SET.music); }
   $('play').onclick = () => { music(); if (SET.skipCuts) enterPlay(0); else enterCut(0); };
-  addEventListener('pointerdown', music, { once: true });      // after a reload there is no Play button to start it
+  for (const ev of ['pointerdown', 'touchend', 'click']) addEventListener(ev, music, { once: true });      // after a reload there is no Play button to start it
   $('skip').onclick = () => { if (S.mode === 'out') S.t = L.OUT.dur; else enterPlay(0); };
   // drag to look around while answering; the wheel zooms. Each new question starts from its own view again.
   let drag = null;
