@@ -184,3 +184,4 @@
 
   /* the body is exactly the usable screen, and (being transformed) it is what every fixed panel and button is placed against */
   body { position: fixed; left: 0; top: 0; width: var(--vw, 100vw); height: var(--vh, 100dvh); transform: translateZ(0); overflow: hidden; }
+  .who.everyone { background: var(--orange) !important; }

@@ -210,7 +210,7 @@ runLevel({
     const CUT = { dur: 35.6, caps: [
       [0.6, 4.6, 'Bill', 'All right, Mark, I think you took the edge in the physical part. And I think I know why.'],
       [4.8, 6.6, 'Mark', 'The training paid off, I know—'],
-      [6.8, 13.4, 'Bill', 'Yes, but did you notice the security guard suddenly stopped all of his “busy work”? He can’t help Lester with the physical stuff. He’s feeding him real answers for everything else.'],
+      [6.8, 13.4, 'Bill', 'Yes, but did you notice the security guard suddenly stopped all of his “busy work”? I think he’s feeding him the real answers! I don’t know how.'],
       [13.6, 15.8, 'Mark', "What? That's crazy, man. What do we do?"],
       [16.0, 20.4, 'Bill', "Let me worry about the security. Just focus. You're better than Lester."],
       [21.4, 25.2, 'Official', 'Freestyle round, gentlemen. Three minutes on the clock. Begin.'],
@@ -241,7 +241,8 @@ runLevel({
     }
 
     // ---------- the ending ----------
-    const OUT = { dur: 55, calm: 32.5, caps: [
+    const BOW = 53;                                      // when the curtain call starts
+    const OUT = { dur: 78, calm: 32.5, caps: [
       [0.4, 1.8, 'Official', 'Time!'],
       [6.0, 10.2, 'Mystery Guyson', 'That is correct, Mark. Within a few angstroms.'],
       [10.5, 14.6, 'Official', "That's impossible! No one can estimate length to an atomic level!"],
@@ -252,10 +253,47 @@ runLevel({
       [28.7, 31.4, 'Bill', 'Good guess… for a new Estimator.'],
       [40.5, 43.1, 'Jack', "Man, I don't know what to say."],
       [43.5, 50.5, 'Mark', "Just focus on getting well and healing up after the surgery. There's always more rocks to climb, buddy… and we got plenty of extra rope."],
+      [BOW + 10.6, BOW + 12.6, 'Jack', "I can't reach! It's too short!"],
+      [BOW + 12.9, BOW + 16.2, 'Mark', "That's ridiculous. It's the perfect length. I just know."],
+      [BOW + 16.6, BOW + 18.8, 'Everyone', "You're off the mark, Mark!"],
     ], cards: [
       [32.5, 35.0, 'A few days later…'],
-      [51.5, 55, 'THE END'],
+      [51, BOW, '<div>Ladies and gentlemen…<small>the cast</small></div>'],
+      [BOW + 21, 78, '<div>THE END<small>Thank you for playing.</small></div>'],
     ] };
+    // The curtain call: the whole cast walks out and bows, twice. Then a rope comes down from the sky, and it is, once again, a little short.
+    const b0 = bailey.position.clone(), LINE = [['Security guy', guard], ['The Official', official], ['Amy', amy], ['Jack', jackH], ['Mark', mark], ['Bill', bill], ['Lester', lester], ['Mystery Guyson', smith]];
+    function curtain(T) {
+      markC.visible = false;
+      const ly = -5.0, lx = (i) => 3.5 + (i - 3.5) * 0.98, mxx = lx(4), jx = lx(3);
+      const bow = (a) => Math.max(0, Math.sin(Math.PI * clamp((T - a) / 1.8, 0, 1)));
+      const turn = ease((T - 16.4) / 0.5), hop = T > 18.8 ? Math.min(T - 18.8, 0.45) : 0, up = 4.2 * hop - 4.5 * hop * hop;
+      LINE.forEach(([name, c], i) => {
+        const inn = ease((T - 0.3 - i * 0.12) / 3.2), y = 3.5 + (ly - 3.5) * inn, walking = inn > 0 && inn < 1, isMark = c === mark, isJack = c === jackH;
+        const yaw = isMark ? 0 : turn * faceDir(mxx - lx(i), 0.35);
+        place(c, lx(i), y, isMark ? 0 : up, yaw);
+        if (walking) c.userData.setPose('run', T * 0.8 + i * 0.3);
+        else if (hop > 0 && !isMark) c.userData.setPose('jump', 0.12 + 0.6 * hop);
+        else c.userData.setPose('idle', T + i * 0.4);
+        const b = (c === lester ? 0.35 * bow(6.9) : Math.max(bow(4.2), bow(6.6)));       // Lester manages a nod, late
+        if (b > 0) c.userData.aim('Spine', 'Neck', V(0, -Math.sin(1.15 * b), Math.cos(1.15 * b)));       // bend at the waist, towards the camera
+        if (isJack && T > 9.6 && T < 18.8) {                                              // Jack stretches for the rope, on tiptoe
+          const r = ease((T - 9.6) / 0.5);
+          c.position.z = 0.12 * r * Math.abs(Math.sin((T - 9.6) * 5));
+          for (const sd of ['Left', 'Right']) aimArm(c, sd, V(sd === 'Left' ? 0.12 : -0.12, -0.05, 1));
+        }
+        if (isMark && T > 12.9 && T < 18.8) { aimArm(mark, 'Left', V(0.9, -0.2, 0.05)); aimArm(mark, 'Right', V(-0.9, -0.2, 0.05)); }   // the shrug
+        if (T > 1.2 && T < 9.2 && !walking) tag(V(lx(i), y, i % 2 ? 2.85 : 2.3), name);
+      });
+      const drop = ease((T - 8.8) / 0.9);                                                 // the rope, from the sky, stopping just out of reach
+      if (drop > 0) { rope.visible = true; stick(rope, V(jx, ly, 16), V(jx, ly, 16 - (16 - 2.62) * drop)); }
+      { const k = clamp((T - 9.5) / 9, 0, 1), bx = -3.5 + 14 * k;                            // Bailey trots through, unbothered
+        putSet(bailey, bx, ly - 1.7, b0.y + 0.05 * Math.abs(Math.sin(T * 9)), bailey.rotation.y);
+        if (k <= 0 || k >= 1) bailey.position.copy(b0); }
+      const u = ease(T / 9), v = ease((T - 9) / 3);
+      camera.position.lerpVectors(V(3.5, -16.5, 3.0), V(3.5, -14.0, 2.0), u).lerp(V(4.6, -14.6, 1.5), v);
+      camLook.set(3.5, ly, 1.15 + 0.9 * v);
+    }
     function runOut(t) {
       reset();
       camera.fov = 30;
@@ -288,7 +326,8 @@ runLevel({
         if (t < 5.6) { const u = ease(t / 5.6); camera.position.lerpVectors(V(3.5, -10.6, 3.2), V(2.2, -9.4, 2.2), u); camLook.set(3.0, -3.4, 1.0); }
         else if (t < 25) { const u = ease((t - 5.6) / 19); camera.position.lerpVectors(V(2.2, -9.4, 2.2), V(3.2, -8.6, 1.9), u); camLook.set(3.4, -3.8, 1.0); }
         else { const u = ease((t - 25) / 7); camera.position.lerpVectors(V(1.6, -8.6, 1.9), V(2.0, -7.6, 1.7), u); camLook.set(2.3, -3.6, 1.05); }
-      } else {                                                               // Jack and Amy's: the cheque
+      } else if (t >= BOW) curtain(t - BOW);
+      else {                                                               // Jack and Amy's: the cheque
         for (const c of [mark, bill, lester, official, guard, smith]) c.visible = false;
         for (const c of [amy, jackH, markC]) c.visible = true;
         const hx = H[0], hy = H[1];
