@@ -44,7 +44,11 @@ const ring = new THREE.Mesh(new THREE.TorusGeometry(0.32, 0.04, 8, 28), toon(0xf
 const bag = new THREE.Mesh(new THREE.SphereGeometry(0.085, 12, 8), toon(0xe5484d));
 bag.scale.z = 0.6;
 const tape = new THREE.Mesh(new THREE.BoxGeometry(1, 0.12, 0.03), toon(0xffd23f));
-for (const m of [sw, ring, bag, tape]) { m.traverse((o) => { o.castShadow = true; }); scene.add(m); }
+const cone = new THREE.Mesh(new THREE.ConeGeometry(0.22, 0.6, 14), toon(0xf47a2a));
+cone.rotation.x = Math.PI / 2;
+const stepMarks = new THREE.Group();                // two footprints, one stride apart
+for (const i of [0, 1]) { const m = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.13, 0.012), toon(0xffffff)); m.position.x = i * 2.5 * FT; stepMarks.add(m); }
+for (const m of [sw, ring, bag, tape, cone, stepMarks]) { m.traverse((o) => { o.castShadow = true; }); scene.add(m); }
 
 function place(c, x, y, z, yaw) { c.position.set(x, y, z); c.rotation.set(0, 0, yaw); }
 const faceDir = (dx, dy) => Math.atan2(dx, -dy);   // yaw that makes a character look along (dx, dy)
@@ -65,7 +69,7 @@ function billInCar(t) {                             // Bill wedged into the peda
 }
 function resetProps() {
   setSwing(0);
-  ring.visible = bag.visible = tape.visible = lane.visible = false;
+  ring.visible = bag.visible = tape.visible = lane.visible = cone.visible = stepMarks.visible = false;
   for (const r of riders) r.visible = true;
   markB.visible = false; mark.visible = true; bill.visible = true;
   for (const r of riders) r.rotation.z = 0;
@@ -255,12 +259,40 @@ const hurdles = { id: 'hurdles', label: 'Hurdles', kind: 'live', act: 'JUMP!', l
       line: n === 0 ? 'The duck won. All three of them won.' : null };
   } };
 
+// Paces: how many of Mark's steps to the cone? He walks it, and Bill counts.
+const PC = { x0: -9.5, y: -4.2, stride: 2.5, n: rint(9, 17), beat: 0.42 };
+const paces = { id: 'paces', label: 'Paces', kind: 'dial', lock: 'Walk it', view: [V(PC.x0 + 6.6, -22.5, 5.6), V(PC.x0 + 6.6, -1.4, 1.4)],
+  ask: 'Final exam. No tape measure, just your legs. How many steps will it take you to reach the cone?',
+  hint: 'One of your steps is two and a half feet. The white marks at your feet are one step apart.  ' + tierHint(1, 2, 4, 'steps'),
+  dial: { min: 1, max: 40, step: 1, start: 1, unit: 'steps' },
+  dur: () => 0.5 + PC.n * PC.beat + 2.0,
+  frame(phase, t, g) {
+    const rt = phase === 'reveal' ? t : 0, done = clamp((rt - 0.5) / PC.beat, 0, PC.n), walking = rt > 0.5 && done < PC.n;
+    const x = PC.x0 + done * PC.stride * FT, cx = PC.x0 + PC.n * PC.stride * FT;
+    cone.visible = stepMarks.visible = true;
+    for (const r of riders) r.visible = false;         // a clear path to the cone
+    cone.position.set(cx + 0.45, PC.y, G0 + 0.3);
+    stepMarks.position.set(PC.x0 + 0.1, PC.y - 0.75, G0 + 0.012);
+    place(mark, x, PC.y, G0, faceDir(1, 0));
+    mark.userData.setPose(walking ? 'run' : 'idle', walking ? (rt - 0.5) / PC.beat * 0.5 : t);
+    place(bill, cx + 1.3, PC.y + 1.5, G0, faceDir(-1, -0.6));
+    bill.userData.setPose('idle', t + 0.6);
+    if (phase === 'ask') { tag(V(PC.x0 + 0.5, PC.y - 0.75, G0 + 0.1), 'one step'); tag(V(cx + 0.45, PC.y, G0 + 1.0), 'cone'); }
+    else if (done >= 1) tag(V(x, PC.y, 2.2), done >= PC.n ? `${PC.n} steps` : String(Math.floor(done)), done >= PC.n);
+  },
+  result(g) {
+    const miss = Math.abs(g - PC.n);
+    return { stars: tiers(miss, 1, 2, 4), short: `${g} / ${PC.n} steps`,
+      nums: miss === 0 ? `Exactly ${PC.n} steps.` : `You said ${g}. It took ${PC.n} steps, which is ${num(PC.n * PC.stride)} feet.`,
+      line: miss === 0 ? 'To the step. You are ready.' : null };
+  } };
+
 const CH = [
   swing('swing1', 'The swing', rfloat(0.58, 0.8), false, 'I let go of the swing. Stand as close as you can to where it stops, without getting hit.', [V(-5.0, -9.6, 1.9), V(-5.0, 0.8, 1.1)]),
   tunnel,
-  hurdles,
   toss('toss2', 'Bean bag, far ring', rint(22, 40), 'You did this on the carpet. Now do it across the playground. How far is the ring?', [V(-14.2, -9.6, 3.6), V(-3.4, -4.2, 0.1)]),
-  swing('swing2', 'The swing, blindfolded', rfloat(0.92, 1.1), true, 'Final exam. Higher, and blindfolded. Pick your spot and trust it.', [V(-0.6, -8.8, 2.9), V(-5.2, 0.8, 1.0)]),
+  hurdles,
+  paces,
 ];
 // ---------- cutscene ----------
 const CUT = { dur: 12.6, caps: [[0.8, 5.2, 'Bill', "An estimator's body is his instrument, Mark. Today we train outside."],

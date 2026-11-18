@@ -9,7 +9,7 @@ import { RULE, starText, pctStars, offText, showResults } from './scoring.js';
 import { rnd, rint, pick, shuffled } from './rng.js';
 import { startMusic } from './music.js';
 import { SET, DIFF } from './settings.js';
-import { shell, initShell, graphics, frameView } from './shell.js';
+import { shell, view, fit, initShell, graphics, frameView } from './shell.js';
 
 const Q = new URLSearchParams(location.search);          // debug: ?start=cut&shot=1&t=3&still=1, ?start=play&q=2&guess=4&rt=1
 const $ = (id) => document.getElementById(id);
@@ -39,9 +39,9 @@ scene.add(sun, sun.target);
 graphics(renderer, sun);
 const ink = new InkRenderer(renderer);
 function resize() {
-  renderer.setSize(innerWidth, innerHeight);
-  ink.setSize(innerWidth, innerHeight);
-  camera.aspect = innerWidth / innerHeight;
+  renderer.setSize(view.w, view.h);
+  ink.setSize(view.w, view.h);
+  camera.aspect = view.w / view.h;
   camera.updateProjectionMatrix();
 }
 addEventListener('resize', resize);
@@ -207,9 +207,10 @@ const SHOTS = [
       place(elliot, 0.1, 2.3, 0.07, faceDir(0.8, -1));
       elliot.userData.setPose('idle', t + 0.9);
       const fall = Math.max(0, t - 15.0), z = Math.max(JACK_LAND, JACK_HANG - 4.5 * fall * fall), down = z <= JACK_LAND;
-      place(jack, down ? 3.3 : 2.82, 0, down ? JACK_LAND + 0.1 : z, faceDir(-1, 0));
+      const out = ease(fall / 0.5);                                // he drifts clear of the rock face as he drops, and lands flat on his back, head away from it
+      place(jack, 2.82 + 0.7 * out, 0, down ? JACK_LAND + 0.16 : z, faceDir(-1, 0));
       if (down) jack.userData.setPose('idle', 0); else hang(jack);
-      jack.rotation.y = down ? -Math.PI / 2 : 0;
+      jack.rotation.y = down ? Math.PI / 2 : 0.5 * out;
       // the rope goes over the edge and hangs down the face: it stops a foot and a half above Jack's fingers
       const grip = jack.userData.bones.RightHand.getWorldPosition(V(0, 0, 0));
       const RX = 2.95, RY = 0.38, ROPE_TOP = 0.15, ROPE_END = (down ? JACK_HANG + 2.2 : grip.z) + 0.45, drop = ease((t - 10.4) / 0.7), len = (ROPE_TOP - ROPE_END) * drop;
@@ -320,8 +321,8 @@ function clearTags() { for (const t of tags) t.el.remove(); tags.length = 0; }
 function placeTags() {
   for (const t of tags) {
     const p = t.pos.clone().project(camera);
-    t.el.style.left = ((p.x * 0.5 + 0.5) * innerWidth) + 'px';
-    t.el.style.top = ((-p.y * 0.5 + 0.5) * innerHeight) + 'px';
+    t.el.style.left = ((p.x * 0.5 + 0.5) * view.w) + 'px';
+    t.el.style.top = ((-p.y * 0.5 + 0.5) * view.h) + 'px';
     t.el.style.display = p.z < 1 ? '' : 'none';
   }
 }
@@ -467,6 +468,7 @@ function moveView(dt) {
 const clock = new THREE.Clock(), frame = {};
 let frames = 0;
 function tick() {
+  if (fit()) resize();                                 // phone browsers do not always announce a change of size
   const dt = Math.min(clock.getDelta(), 0.1) * (still || shell.paused ? 0 : 1);
   S.t += dt;
   if (audio) audio.setMood(S.mode === 'cut' ? 'drama' : 'home');

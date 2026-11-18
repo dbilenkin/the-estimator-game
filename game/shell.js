@@ -3,8 +3,26 @@
 import { SET, saveSettings, DIFFS, LEVELS, unlocked, unlock, eraseProgress } from './settings.js';
 
 export const shell = { paused: false, menuOpen: false, audio: null };
+
+// Some phone browsers report a page wider than the part that can actually be seen and touched (a side toolbar or the notch takes the rest).
+// The game is laid out inside the usable part only: the body is pinned to that size, and every panel and button is placed within it.
+export const view = { w: innerWidth, h: innerHeight };
+export function fit() {                                // returns true when the usable size has changed
+  const vv = window.visualViewport;
+  const w = Math.floor(Math.min(innerWidth, vv ? vv.width : innerWidth, document.documentElement.clientWidth || innerWidth));
+  const h = Math.floor(Math.min(innerHeight, vv ? vv.height : innerHeight));
+  if (w === view.w && h === view.h && view.set) return false;
+  view.w = w; view.h = h; view.set = true;
+  document.documentElement.style.setProperty('--vw', w + 'px');
+  document.documentElement.style.setProperty('--vh', h + 'px');
+  return true;
+}
+fit();
+addEventListener('resize', fit);
+addEventListener('orientationchange', () => setTimeout(fit, 300));
+if (window.visualViewport) window.visualViewport.addEventListener('resize', fit);
 const el = (tag, cls, html = '') => { const e = document.createElement(tag); if (cls) e.className = cls; e.innerHTML = html; return e; };
-const portraitPhone = () => innerHeight > innerWidth && innerWidth < 600;
+const portraitPhone = () => view.h > view.w && view.w < 600;
 function refreshPause() { shell.paused = shell.menuOpen || portraitPhone(); }
 
 export function graphics(renderer, sun) {              // 'fast' is for phones: no shadows
@@ -114,7 +132,7 @@ export function initShell(level) {
 // When that space is narrower than the views were composed for, the camera widens so the same width of scene still fits.
 const BASE = { play: 24, show: 30 }, COMPOSED = { play: 2.6, show: 1.75 };
 export function frameView(camera, st, { playing, panel, cine, snap }) {
-  const W = innerWidth, H = innerHeight;
+  const W = view.w, H = view.h;
   if (panel && playing) {
     const p = panel.getBoundingClientRect();
     if (p.width) st.free = p.left > W * 0.45 ? { r: p.left - 10, b: H } : { r: W, b: p.top - 14 };

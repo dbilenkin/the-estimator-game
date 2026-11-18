@@ -9,7 +9,7 @@ import { loadCharacter } from './cast.js';
 import { starText, showResults } from './scoring.js';
 import { startMusic } from './music.js';
 import { SET, DIFF, levelOf } from './settings.js';
-import { shell, initShell, graphics, frameView, pinchZoom } from './shell.js';
+import { shell, view, fit, initShell, graphics, frameView, pinchZoom } from './shell.js';
 
 // debug: ?start=cut&t=7&still=1, ?start=play&q=1&guess=5&rt=1.5&still=1, ?start=play&q=3&live=2&press=1.1,2.2&still=1,
 //        ?start=results, ?sim=8 (fast-forward 8 s), &auto=1 (click through), ?cam=x,y,z,lx,ly,lz
@@ -43,9 +43,9 @@ export async function runLevel(cfg) {
   if (cfg.indoor) { sun.target.position.set(2.5, 0, 0); sun.position.set(7, -6.5, 8.5); }
   const ink = new InkRenderer(renderer);
   function resize() {
-    renderer.setSize(innerWidth, innerHeight);
-    ink.setSize(innerWidth, innerHeight);
-    camera.aspect = innerWidth / innerHeight;
+    renderer.setSize(view.w, view.h);
+    ink.setSize(view.w, view.h);
+    camera.aspect = view.w / view.h;
     camera.updateProjectionMatrix();
   }
   addEventListener('resize', resize);
@@ -102,8 +102,8 @@ export async function runLevel(cfg) {
     const placed = [];
     for (const t of tags) {                           // keep labels on screen, below the HUD, and off each other
       const p = t.pos.clone().project(camera), w = t.el.offsetWidth || 160, h = t.el.offsetHeight || 40;
-      let x = clamp((p.x * 0.5 + 0.5) * innerWidth, w / 2 + 8, Math.max(w / 2 + 8, (S.mode === 'ask' || S.mode === 'verdict' ? frame.r || innerWidth : innerWidth) - w / 2 - 8));
-      let y = Math.max((-p.y * 0.5 + 0.5) * innerHeight, (frame.t || 0) + 6 + h);
+      let x = clamp((p.x * 0.5 + 0.5) * view.w, w / 2 + 8, Math.max(w / 2 + 8, (S.mode === 'ask' || S.mode === 'verdict' ? frame.r || view.w : view.w) - w / 2 - 8));
+      let y = Math.max((-p.y * 0.5 + 0.5) * view.h, (frame.t || 0) + 6 + h);
       for (let k = 0; k < 6; k++) {
         const hit = placed.find((q) => Math.abs(q.x - x) < (q.w + w) / 2 + 6 && Math.abs(q.y - y) < Math.max(q.h, h) + 6);
         if (!hit) break;
@@ -337,6 +337,7 @@ export async function runLevel(cfg) {
     }
   }
   function tick() {
+    if (fit()) resize();                               // phone browsers do not always announce a change of size
     const dt = Math.min(clock.getDelta(), 0.1);
     step(still || shell.paused ? 0 : dt);
     const playing = ['ask', 'live', 'reveal', 'verdict'].includes(S.mode);
