@@ -7,9 +7,9 @@ const el = (tag, cls, html = '') => { const e = document.createElement(tag); if 
 const portraitPhone = () => innerHeight > innerWidth && innerWidth < 600;
 function refreshPause() { shell.paused = shell.menuOpen || portraitPhone(); }
 
-export function graphics(renderer, sun) {              // 'fast' is for phones: fewer pixels, no shadows
+export function graphics(renderer, sun) {              // 'fast' is for phones: no shadows
   const fast = SET.gfx === 'fast';
-  renderer.setPixelRatio(Math.min(devicePixelRatio, fast ? 1.25 : 2));
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));      // sharp on both; 'fast' saves its time on shadows
   if (fast) renderer.shadowMap.enabled = false;
   if (sun && fast) sun.castShadow = false;
 }
